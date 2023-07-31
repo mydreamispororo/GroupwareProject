@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ko">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>게시판 리스트 페이지</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" th:href="@{/css/style.css}" />
+  <link rel="stylesheet" th:href="@{/css/header.css}" />
+  <style>
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f1f6;
+    }
+
+    h2 {
+      font-family: Arial, sans-serif;
+    }
+
+    .write {
+      font-family: Arial, sans-serif;
+      color: #eeecfbc7;
+      
+    }
+
+    /* Styling for table */
+    .wrap {
+      max-width: 1500px;
+      margin: 50px auto;
+      padding: 20px;
+      background-color: #ffffff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      border-radius: 5px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: center;
+      border-bottom: 2px solid #ebebeb;
+    }
+
+    table tr th {
+      height: 30px;
+    }
+
+    tbody tr td .thspan {
+      background-color : #f0f1f6;
+    }
+
+
+    /* Style the buttons */
+    .btn-container {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .btn-list {
+      padding: 5px 10px;
+      background-color: #848484;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .btn-list:hover {
+      background-color: #353535;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div id="header">
+      <div class="container">
+        <div class="container-left clearfix">
+          <div class="logo">
+            <img src="/images/Logo.png" alt="logo" />
+          </div>
+          <div class="menu clearfix">
+            <div class="menu-item">
+              <a href="#">Personal</a>
+            </div>
+            <div class="menu-item">
+              <a href="#">Open Source</a>
+            </div>
+            <div class="menu-item">
+              <a href="#">Business</a>
+            </div>
+            <div class="menu-item">
+              <a href="#">Explore</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+<div class="wrap">
+  <table>
+    <h2>게시판</h2>
+
+    <a th:href="@{/board/write}"><i class="fa-solid fa-pencil"></i>글쓰기</a>
+    |
+    <a th:href="@{/main}">메인페이지</a>
+    <thead>
+    <tr>
+      <th width="70">번호</th>
+      <th width="500">제목</th>
+      <th width="120">작성자</th>
+      <th width="70">조회수</th>
+      <th width="70">첨부파일</th>
+      <th width="100">등록일</th>
+      <th width="100">비고</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    <tr th:each="board, num: ${board}" style="text-align :center">
+      <td>
+        <th:block th:if="${board.grpBoardNotice eq 'N'}">
+        [[${num.size - num.index}]]
+        </th:block>
+        <th:block th:unless="${board.grpBoardNotice eq 'N'}">
+          <span style="font-size: 12px;"><i class="fa-solid fa-bullhorn fa-lg" style="color: #fb9d18; font-size: 20px;"></i></i>공지</span>
+        </th:block>
+      </td>
+      <td>
+        <a th:href="@{/board/modify(grpBoardId=${board.grpBoardId})}">
+          <strong th:text="${board.grpBoardSubject}">[[${board.grpBoardSubject}]]</strong>
+        </a>
+      </td>
+      <td>[[${board.grpBoardWriter}]]</td>
+      <td>[[${board.grpBoardVisit}]]</td>
+      <td>
+        <th:block th:if="${board.grpBoardUploadName != null}">
+          <i class="fa-solid fa-download"></i>
+        </th:block>
+        <th:block th:unless="${board.grpBoardUploadName != null}">
+          -
+        </th:block>
+      </td>
+      <td>[[${board.grpBoardRegdate}]]</td>
+      <td>
+        <a th:href="@{/board/modify?(grpBoardId = ${board.grpBoardId})}">수정</a>
+        <a th:href="@{/board/delete?(grpBoardId = ${board.grpBoardId})}">삭제</a>
+      </td>
+    </tr>
+
+    </tbody>
+  </table>
+</div>
+</body>
+</html>
