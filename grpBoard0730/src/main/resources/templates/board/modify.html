@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ko">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>게시판 수정 페이지</title>
+    <style>
+
+    a {
+        text-decoration-line: none;
+    }
+
+    h1 {
+        text-align: center;
+        margin-top: 50px;
+        font-size: 30px;
+    }
+
+    
+    .wrap {
+        width: 1500px;
+        margin: 100px auto;
+    }
+
+    table {
+      width: 100%;
+    }
+
+    tr {
+      height: 40px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+
+    }
+
+    .btn {
+      padding: 5px 10px;
+      background-color: #848484;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .btn:hover {
+      background-color: #353535;
+    }
+  </style>
+    <script src="/js/jquery.js"></script>
+</head>
+<body>
+<h1>게시판 수정 페이지</h1>
+
+<div class="wrap">
+    <form>
+        <table>
+            <tr>
+                <td>분류</td>
+                <td>
+                    <select name="grpBoardNotice" class="grpBoardNotice">
+                        <option value="Y" th:selected="${board.grpBoardNotice eq 'Y'}">공지</option>
+                        <option value="N" th:selected="${board.grpBoardNotice eq 'N'}">일반</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>제목</td>
+                <td>
+                    <input th:value="${board.grpBoardSubject}" type="text" name="grpBoardSubject" class="grpBoardSubject" maxlength="50">
+                </td>
+            </tr>
+            <tr>
+                <td>작성자</td>
+                <td>
+                    <input th:value="${board.grpBoardWriter}" type="text" name="grpBoardWriter" class="grpBoardWriter" maxlength="20">
+                </td>
+            </tr>
+            <tr>
+                <td>내용</td>
+                <td>
+                    <textarea name="grpBoardContent" class="grpBoardContent" id="editor" th:utext="${board.grpBoardContent}"></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td>첨부파일</td>
+                <td>
+                    <input type="file" name="" class="" id="attach">
+                    <th:block th:if="${board.grpBoardUploadName == null}">
+                        업로드 된 첨부파일이 없습니다.
+                    </th:block>
+                    <th:block th:unless="${board.grpBoardUploadName == null}">
+                        [[${board.grpBoardUploadName}]] ([[${#numbers.formatInteger(board.grpBoardUploadSize, 3, 'COMMA')}]]bytes)
+                        <a href="">Download</a>
+                    </th:block>
+                </td>
+            </tr>
+        </table>
+        <div>
+            <button type="button" class="btn">수정하기</button>
+            <a href="/board/list">
+                <button type="button" class="btn">목록</button>
+            </a>
+            <a href="/main">
+                <button type="button" class="btn">메인페이지</button>
+            </a>
+        </div>
+        <input type="hidden" class="grpBoardId" th:value="${board.grpBoardId}">
+
+        <input type="hidden" class="grpBoardUploadName" th:value="${board.grpBoardUploadName}">
+        <input type="hidden" class="grpBoardUploadSize" th:value="${board.grpBoardUploadSize}">
+        <input type="hidden" class="grpBoardUploadTrans" th:value="${board.grpBoardUploadTrans}">
+
+    </form>
+</div>
+    <style>
+        .ck-editor__editable {
+          min-height: 300px;
+        }
+    </style>
+
+    <script src="/js/ckeditor.js"></script>
+<script>
+    let myEditor;
+
+    ClassicEditor.create(document.querySelector("#editor"))
+    .then(editor => {
+      myEditor = editor;
+    });
+
+    let grpBoardId = document.querySelector(".grpBoardId");
+    let grpBoardNotice = document.querySelector(".grpBoardNotice");
+    let grpBoardWriter = document.querySelector(".grpBoardWriter");
+    let grpBoardSubject = document.querySelector(".grpBoardSubject");
+    let grpBoardContent = document.querySelector(".grpBoardContent");
+
+    let grpBoardUploadName = document.querySelector(".grpBoardUploadName");
+    let grpBoardUploadSize = document.querySelector(".grpBoardUploadSize");
+    let grpBoardUploadTrans = document.querySelector(".grpBoardUploadTrans");
+
+    let btn = document.querySelector(".btn");
+
+
+    btn.addEventListener("click", function(e) { <!-- 클릭하면 -->
+      e.preventDefault(); <!-- 자동으로 넘어가는 기능을 없앰 -->
+
+      if(!grpBoardSubject.value) {
+          alert("게시물 제목을 입력하세요");
+          grpBoardSubject.focus();
+          return false;
+      }
+
+      if(!grpBoardWriter.value) {
+          alert("게시물 작성자를 입력하세요");
+          grpBoardWriter.focus();
+          return false;
+      }
+
+      if(!myEditor.getData()) { //ajax
+          alert("게시물 내용을 입력하세요");
+          grpBoardContent.focus();
+          return false;
+      }
+
+      let frmData = new FormData();
+      frmData.append("grpBoardId", grpBoardId.value);
+      frmData.append("grpBoardNotice", grpBoardNotice.value);
+      frmData.append("grpBoardSubject", grpBoardSubject.value);
+      frmData.append("grpBoardWriter", grpBoardWriter.value);
+      frmData.append("grpBoardContent", myEditor.getData());
+
+      frmData.append("grpBoardUploadName", grpBoardUploadName.value);
+      frmData.append("grpBoardUploadSize", grpBoardUploadSize.value);
+      frmData.append("grpBoardUploadTrans", grpBoardUploadTrans.value);
+
+      frmData.append("uploadFile", $("#attach")[0].files[0]);
+
+      $.ajax({
+          type: "post",
+          url: "/board/modify",
+          encType: "multipart/form-data",
+          data: frmData,
+          processData: false,
+          contentType: false,
+          cache: false,
+          success: function(res) {
+            if(res.msg == "success") {
+                alert("게시물이 수정되었습니다.");
+                location.href = "/board/list";
+            }
+
+          }
+      });
+    });
+</script>
+
+
+</body>
+</html>
