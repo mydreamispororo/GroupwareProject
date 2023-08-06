@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>게시물 상세 페이지</title>
+    <style>
+
+    a {
+        text-decoration-line: none;
+    }
+
+    h1 {
+        text-align: center;
+        margin-top: 50px;
+        font-size: 30px;
+    }
+
+
+    .wrap {
+        width: 1500px;
+        margin: 100px auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    table tr {
+      height: 40px;
+
+    }
+
+    th, td {
+        border: 1px solid #ccc;
+        padding: 8px;
+
+    }
+
+    .btn {
+      padding: 5px 10px;
+      margin-top: 8px;
+      background-color: #848484;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .btn:hover {
+      background-color: #353535;
+    }
+
+  </style>
+    <script src="/js/jquery.js"></script>
+</head>
+<body>
+<h1>게시물 상세 페이지</h1>
+
+<div class="wrap">
+    <form>
+        <table>
+            <tr>
+                <td>분류</td>
+                <td>
+                    <th:block th:if="${board.grpBoardNotice eq 'N'}">
+                        [일반글]
+                    </th:block>
+                    <th:block th:unless="${board.grpBoardNotice eq 'N'}">
+                        [공지사항]
+                    </th:block>
+                </td>
+            </tr>
+            <tr>
+                <td>제목</td>
+                <td>[[${board.grpBoardSubject}]]</td>
+            </tr>
+            <tr>
+                <td>작성자</td>
+                <td>[[${board.grpBoardWriter}]]</td>
+            </tr>
+            <tr>
+                <td>내용</td>
+                <td>
+                    <textarea name="grpBoardContent" class="grpBoardContent" id="editor" th:text="${board.grpBoardContent}"></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td>첨부파일</td>
+                <td>
+                    <th:block th:if="${board.grpBoardUploadName == null}">
+                        업로드 된 첨부파일이 없습니다.
+                    </th:block>
+                    <th:block th:unless="${board.grpBoardUploadName == null}">
+                        [[${board.grpBoardUploadName}]] ([[${#numbers.formatInteger(board.grpBoardUploadSize, 3, 'COMMA')}]]bytes)
+                        <a th:href="@{/board/download?(dir=${board.grpBoardUploadUrl}, filename = ${board.grpBoardUploadTrans})}">Download</a>
+                    </th:block>
+                </td>
+            </tr>
+        </table>
+        <div>
+            <a th:href="@{/board/modify?(grpBoardId = ${board.grpBoardId})}">
+                <button type="button" class="btn">수정</button>
+            </a>
+            <a href="/board/list">
+                <button type="button" class="btn">목록</button>
+            </a>
+            <a th:href="@{/board/delete?(grpBoardId = ${board.grpBoardId})}">
+                <button type="button" class="btn">삭제</button>
+            </a>
+            <a href="/main">
+                <button type="button" class="btn">메인페이지</button>
+            </a>
+        </div>
+    </form>
+</div>
+<style>
+    .ck-editor__editable {
+      min-height: 300px;
+    }
+  </style>
+
+<script src="/js/ckeditor.js"></script>
+<script>
+    let myEditor;
+
+    ClassicEditor.create(document.querySelector("#editor"))
+    .then(editor => {
+      myEditor = editor;
+    });
+</script>
+
+
+</body>
+</html>
